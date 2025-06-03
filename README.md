@@ -1,1 +1,1 @@
-# ConwayLifeGame
+# Conways Game of Life

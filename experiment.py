@@ -176,7 +176,7 @@ methods = {
 
 for method_name, predicted_values in methods.items():
     plt.figure(figsize=(10, 5))
-    plt.plot(years_pred, actual, label="Actual", linewidth=2)
+    #plt.plot(years_pred, actual, label="Actual", linewidth=2)
     plt.plot(years_pred, predicted_values, label=method_name, linestyle='--')
     plt.xlabel("Year")
     plt.ylabel("Global Mean Temperature Anomaly")
@@ -207,7 +207,7 @@ results_df.to_csv(f"csv/local_temperature_predictions[{start_year}, {end_year}, 
 
 # Calculate RMSE for each method
 for method_name, predicted_values in methods.items():
-    rmse = mean_squared_eror(actual, predicted_values, squared=False)
+    rmse = mean_squared_error(actual, predicted_values) ** 0.5
     print(f"RMSE for {method_name}: {rmse:.5f}")
 
 print("done!")

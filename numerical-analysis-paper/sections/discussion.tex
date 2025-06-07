@@ -12,4 +12,13 @@ The use of local, pointwise interpolation for each prediction year is a key stre
 
 Comparing results across different training intervals ([1950, 2020] vs [1960, 2010]) reveals the sensitivity of each method to boundary effects and data coverage. Methods that perform well in the central interval may degrade near the boundaries, highlighting the importance of interval selection in climate data analysis.
 
+Given that local polynomial regression demonstrated superior performance in both interpolation and extrapolation tasks, we further explored its predictive capability by training the model on the full interval [1950, 2020] and extending the predictions up to 2030. Figure~\ref{fig:future-prediction} illustrates the extrapolated temperature anomaly values for 2021--2030. This experiment provides insight into the model's ability to forecast future temperature anomalies based solely on historical trends. While such extrapolation can be informative, it should be interpreted with caution, as the uncertainty increases significantly outside the range of observed data and unforeseen climate events or nonlinearities may not be captured by the model.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figs/2020s-prediction.png}
+    \caption{Local Polynomial Regression prediction of global mean temperature anomaly for 2021--2030, trained on [1950, 2020].}
+    \label{fig:future-prediction}
+\end{figure}
+
 Additional practical steps, such as data cleaning, normalization within local windows, and robust fallback to linear interpolation, further enhance the reliability and interpretability of the results.

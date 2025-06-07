@@ -1,23 +1,9 @@
-\documentclass{article}
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{hyperref}
-
-\title{Comparative Analysis of Numerical Methods}
-\author{Your Name}
-\date{\today}
-
-\begin{document}
-
-\maketitle
-
 \section{Introduction}
 
-Numerical analysis is a branch of mathematics that deals with algorithms for solving mathematical problems numerically. In this project, we explore various numerical methods, including Lagrange interpolation, Newton's forward and backward interpolation, and polynomial regression. Each of these methods has its own strengths and weaknesses, making them suitable for different types of problems.
+Accurate analysis of climate data is crucial for understanding global warming and its impacts. One of the most widely used metrics in climate science is the \textit{temperature anomaly}, which represents the deviation of the observed temperature from a reference value or baseline period \cite{gistemp, hansen2010global}. This approach allows researchers to compare temperature changes across different regions and time periods, independent of local climate variability.
 
-The primary objective of this study is to compare the performance of these numerical methods in approximating functions based on given data points. We will analyze how well each method performs in terms of accuracy and computational efficiency. The results will be illustrated with graphs that depict the performance of each method against actual data.
+In this project, we focus on the interpolation of global mean temperature anomaly data, a key step in reconstructing continuous climate trends from discrete observations. Interpolation techniques are essential for filling gaps in data, smoothing noise, and enabling further statistical analysis \cite{atkinson1989introduction, burden2011numerical}. We compare several classical numerical interpolation methods, including local Newton forward and backward interpolation, local Lagrange interpolation, and local polynomial regression. Each method is evaluated in terms of accuracy and suitability for climate data analysis.
 
-This paper is structured as follows: Section 2 will detail the methods employed in this analysis, Section 3 will present the results obtained, Section 4 will discuss the implications of these results, and Section 5 will conclude with a summary and suggestions for future work.
+A distinctive aspect of our approach is the use of local, pointwise interpolation: for each prediction year, the interpolation is performed using a window of the nearest neighbors, rather than fitting a global model. This local strategy is designed to increase accuracy, reduce the risk of overfitting or oscillations (such as Runge's phenomenon), and adapt to local variations in the data. We also systematically compare the methods over different training intervals, such as [1950, 2020] and [1960, 2010], to assess their stability and generalization across time.
 
-\end{document}
+The remainder of this paper is organized as follows: Section 2 describes the dataset and the interpolation methods in detail, including data preprocessing and the rationale for local interpolation. Section 3 presents the results of applying these methods to real-world climate data. Section 4 discusses the comparative performance of the methods, and Section 5 concludes with key findings and recommendations.

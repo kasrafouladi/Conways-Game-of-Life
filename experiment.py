@@ -189,6 +189,7 @@ for method_name, predicted_values in methods.items():
     plt.show()
 
 import pandas as pd
+from sklearn.metrics import mean_squared_error
 
 # Prepare data for CSV export
 data = {
@@ -203,5 +204,10 @@ data = {
 # Create DataFrame and export
 results_df = pd.DataFrame(data)
 results_df.to_csv(f"csv/local_temperature_predictions[{start_year}, {end_year}, {step}].csv", index=False)
+
+# Calculate RMSE for each method
+for method_name, predicted_values in methods.items():
+    rmse = mean_squared_eror(actual, predicted_values, squared=False)
+    print(f"RMSE for {method_name}: {rmse:.5f}")
 
 print("done!")

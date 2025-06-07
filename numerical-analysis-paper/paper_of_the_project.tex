@@ -1,15 +1,31 @@
 \documentclass{article}
 \usepackage{graphicx}
-\usepackage{amsmath}
 \usepackage{cite}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
 
-\title{Comparison of Numerical Methods in Analysis}
-\author{Your Name}
+\title{Numerical Analysis Final Project}
+\author{Kasra Fouladi \\ 402442297}
 \date{\today}
 
 \begin{document}
 
 \maketitle
+
+\small
+
+\begin{abstract}
+This paper presents a comprehensive comparison of several classical numerical interpolation
+techniques applied to the analysis of global mean temperature anomaly data. The concept of temperature
+anomaly is introduced, and the problem is formulated in the context of climate data analysis.
+We implement and evaluate local Newton forward and backward interpolation, local Lagrange
+interpolation, and local polynomial regression, using real-world climate datasets.
+The accuracy and characteristics of each method are discussed, providing insights
+into their suitability for scientific data analysis.
+\end{abstract}
 
 \input{sections/introduction.tex}
 \input{sections/methods.tex}

@@ -1,0 +1,28 @@
+\begin{thebibliography}{1}
+
+\bibitem{atkinson1989introduction}
+Kendall~E Atkinson.
+\newblock {\em An Introduction to Numerical Analysis}.
+\newblock John Wiley \& Sons, 1989.
+
+\bibitem{brown2021polynomial}
+Chris Brown.
+\newblock Polynomial regression techniques in data fitting.
+\newblock {\em Applied Mathematics and Computation}, 350:456--470, 2021.
+
+\bibitem{burden2011numerical}
+Richard~L. Burden and J.~Douglas Faires.
+\newblock {\em Numerical Analysis}.
+\newblock Brooks/Cole, 9th edition, 2011.
+
+\bibitem{hansen2010global}
+James Hansen, Reto Ruedy, Makiko Sato, and Ken Lo.
+\newblock Global surface temperature change.
+\newblock {\em Reviews of Geophysics}, 48(4), 2010.
+
+\bibitem{gistemp}
+{NASA Goddard Institute for Space Studies}.
+\newblock Giss surface temperature analysis (gistemp v4), 2024.
+\newblock \url{https://data.giss.nasa.gov/gistemp/}.
+
+\end{thebibliography}

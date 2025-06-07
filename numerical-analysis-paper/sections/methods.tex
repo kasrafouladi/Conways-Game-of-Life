@@ -1,0 +1,37 @@
+\section{Methods}
+
+\subsection{Dataset Description and Preprocessing}
+
+We use the GISS Surface Temperature Analysis (GISTEMP v4) dataset provided by NASA Goddard Institute for Space Studies \cite{gistemp}. This dataset contains monthly global mean temperature anomalies from 1880 to the present, calculated relative to a 1951--1980 baseline. For this study, we extract annual global mean temperature anomalies for the period 1950--2020.
+
+Prior to analysis, we perform data cleaning by removing any missing values (NaNs) from the temperature and time arrays. The global mean is computed by averaging over all spatial grid points. To facilitate fair comparison between interpolation methods, we generate uniformly spaced sample points using linear interpolation, ensuring that all methods operate on the same input data.
+
+\subsection{Choice of Training Intervals}
+
+To evaluate the robustness and generalization of each interpolation method, we conduct experiments on two different training intervals: [1950, 2020] and [1960, 2010]. The first interval covers the full range of recent climate data, including boundary years where interpolation is typically more challenging. The second interval focuses on the central portion of the data, allowing us to assess method performance away from the boundaries and to compare how well each method generalizes to unseen years.
+
+\subsection{Local, Pointwise Interpolation Strategy}
+
+For each target year, interpolation is performed using a local window of the 8 nearest neighbors. This local approach offers several advantages:
+\begin{itemize}
+    \item \textbf{Increased accuracy:} By focusing on nearby data, the interpolant better captures local trends and reduces the influence of distant, potentially irrelevant points.
+    \item \textbf{Reduced oscillations:} Local polynomials are less prone to Runge's phenomenon and numerical instability than high-degree global polynomials.
+    \item \textbf{Adaptability:} The method can flexibly adapt to local changes in the data, which is especially important for real-world, noisy climate records.
+\end{itemize}
+For each method, if insufficient neighbors are available, the window size or polynomial degree is automatically reduced to ensure numerical stability.
+
+\subsection{Interpolation Techniques}
+
+We implement and compare the following interpolation methods:
+\begin{itemize}
+    \item \textbf{Local Newton Forward Interpolation:} Constructs an interpolating polynomial using forward differences, suitable for points near the start of the interval \cite{atkinson1989introduction, burden2011numerical}.
+    \item \textbf{Local Newton Backward Interpolation:} Uses backward differences, providing better accuracy near the end of the interval.
+    \item \textbf{Local Lagrange Interpolation:} Builds a polynomial passing through the local window, offering flexibility and high local accuracy \cite{atkinson1989introduction}.
+    \item \textbf{Local Polynomial Regression:} Fits a polynomial of specified degree to the local window using least squares, with normalization for numerical stability \cite{brown2021polynomial}.
+\end{itemize}
+
+All methods are implemented in Python using \texttt{numpy}, \texttt{scipy}, and \texttt{matplotlib}. If polynomial fitting fails, the code falls back to linear interpolation to ensure robustness.
+
+\subsection{Evaluation and Output}
+
+For each method and interval, we predict temperature anomalies for each year in the evaluation range and compare them to the actual observed values. Results are visualized as plots and saved as CSV files for further analysis. Performance is quantified using root mean square error (RMSE).

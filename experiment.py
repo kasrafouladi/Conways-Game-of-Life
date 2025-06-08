@@ -176,7 +176,7 @@ methods = {
 
 for method_name, predicted_values in methods.items():
     plt.figure(figsize=(10, 5))
-    #plt.plot(years_pred, actual, label="Actual", linewidth=2)
+    plt.plot(years_pred, actual, label="Actual", linewidth=2)
     plt.plot(years_pred, predicted_values, label=method_name, linestyle='--')
     plt.xlabel("Year")
     plt.ylabel("Global Mean Temperature Anomaly")

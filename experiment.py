@@ -5,17 +5,20 @@ from scipy.interpolate import lagrange
 from numpy.polynomial.polynomial import Polynomial
 
 # Load NetCDF dataset
-ds = xr.open_dataset("dataset/gistemp1200_GHCNv4_ERSSTv5.nc")
+ds = xr.open_dataset("dataset/data_stream-mnth.nc")
 
-# Extract global mean temperature anomaly and clean NaNs
-global_mean = ds['tempanomaly'].mean(dim=['lat', 'lon'])
+# Select June, July, August and compute mean over the specified region
+ds_summer = ds.sel(time=ds.time.dt.month.isin([6, 7, 8]))
+global_mean = ds_summer['t2m'].mean(dim=['latitude', 'longitude'])
+
+# Extract time (years) and temperature, clean NaNs
 time = global_mean['time'].dt.year.values
 temp = global_mean.values
 temp_clean = temp[~np.isnan(temp)]
 time_clean = time[~np.isnan(temp)]
 
 # Select uniform interval points
-start_year, end_year, step = input("please enter start_year, end_year and step for sampel data. years should be in range [1950, 2020]:\n").split()
+start_year, end_year, step = input("please enter start_year, end_year and step for sample data. years should be in range [1950, 2020]:\n").split()
 start_year = int(start_year)
 end_year = int(end_year)
 step = int(step)
@@ -33,19 +36,16 @@ def forward_diff_table(y):
 
 # Local Newton Forward Interpolation (using 8 nearest neighbors)
 def local_newton_forward(x, x_vals, y_vals, num_neighbors=8):
-    # Find nearest neighbors
     idx = np.abs(x_vals - x).argmin()
     start = max(0, idx - num_neighbors//2)
     end = min(len(x_vals), start + num_neighbors)
     
-    # Adjust start if we're at the end
     if end == len(x_vals):
         start = max(0, end - num_neighbors)
     
     sub_x = x_vals[start:end]
     sub_y = y_vals[start:end]
     
-    # Check if we have enough points
     if len(sub_x) < 2:
         return np.interp(x, x_vals, y_vals)
     
@@ -63,19 +63,16 @@ def local_newton_forward(x, x_vals, y_vals, num_neighbors=8):
 
 # Local Newton Backward Interpolation (using 8 nearest neighbors)
 def local_newton_backward(x, x_vals, y_vals, num_neighbors=8):
-    # Find nearest neighbors
     idx = np.abs(x_vals - x).argmin()
     start = max(0, idx - num_neighbors//2)
     end = min(len(x_vals), start + num_neighbors)
     
-    # Adjust start if we're at the end
     if end == len(x_vals):
         start = max(0, end - num_neighbors)
     
     sub_x = x_vals[start:end]
     sub_y = y_vals[start:end]
     
-    # Check if we have enough points
     if len(sub_x) < 2:
         return np.interp(x, x_vals, y_vals)
     
@@ -97,14 +94,12 @@ def local_lagrange_interp(x, x_vals, y_vals, num_neighbors=8):
     start = max(0, idx - num_neighbors//2)
     end = min(len(x_vals), start + num_neighbors)
     
-    # Adjust start if we're at the end
     if end == len(x_vals):
         start = max(0, end - num_neighbors)
     
     sub_x = x_vals[start:end]
     sub_y = y_vals[start:end]
     
-    # Check if we have enough points
     if len(sub_x) < 2:
         return np.interp(x, x_vals, y_vals)
     
@@ -113,26 +108,21 @@ def local_lagrange_interp(x, x_vals, y_vals, num_neighbors=8):
 
 # Local Polynomial regression (using 8 nearest neighbors)
 def local_poly_regression(x, x_vals, y_vals, degree=4, num_neighbors=8):
-    # Find nearest neighbors
     idx = np.abs(x_vals - x).argmin()
     start = max(0, idx - num_neighbors//2)
     end = min(len(x_vals), start + num_neighbors)
     
-    # Adjust start if we're at the end
     if end == len(x_vals):
         start = max(0, end - num_neighbors)
     
     sub_x = x_vals[start:end]
     sub_y = y_vals[start:end]
     
-    # Check if we have enough points and adjust degree if necessary
     if len(sub_x) < 2:
         return np.interp(x, x_vals, y_vals)
     
-    # Adjust degree if we don't have enough points
     actual_degree = min(degree, len(sub_x) - 1)
     
-    # Normalize local data for stability
     x_mean, x_std = sub_x.mean(), sub_x.std()
     y_mean, y_std = sub_y.mean(), sub_y.std()
     
@@ -144,18 +134,16 @@ def local_poly_regression(x, x_vals, y_vals, degree=4, num_neighbors=8):
     x_norm = (sub_x - x_mean) / x_std
     y_norm = (sub_y - y_mean) / y_std
     
-    # Fit polynomial
     try:
         poly = Polynomial.fit(x_norm, y_norm, actual_degree)
         x_pred_norm = (x - x_mean) / x_std
         y_pred_norm = poly(x_pred_norm)
         return y_pred_norm * y_std + y_mean
     except:
-        # Fallback to linear interpolation if polynomial fitting fails
         return np.interp(x, sub_x, sub_y)
 
 # Prediction range
-years_pred = np.arange(1950, 2020)
+years_pred = np.arange(1950, 2021)
 
 # Local interpolations
 local_forward_pred = [local_newton_forward(x, uniform_years, uniform_temps) for x in years_pred]
@@ -179,7 +167,7 @@ for method_name, predicted_values in methods.items():
     plt.plot(years_pred, actual, label="Actual", linewidth=2)
     plt.plot(years_pred, predicted_values, label=method_name, linestyle='--')
     plt.xlabel("Year")
-    plt.ylabel("Global Mean Temperature Anomaly")
+    plt.ylabel("Mean 2m Temperature (°C) [June, July, August]")
     plt.title(f"{method_name} vs Actual")
     plt.legend()
     plt.grid(True)
@@ -203,7 +191,7 @@ data = {
 
 # Create DataFrame and export
 results_df = pd.DataFrame(data)
-results_df.to_csv(f"csv/local_temperature_predictions[{start_year}, {end_year}, {step}].csv", index=False)
+results_df.to_csv(f"csv/local_t2m_predictions[{start_year}, {end_year}, {step}].csv", index=False)
 
 # Calculate RMSE for each method
 for method_name, predicted_values in methods.items():

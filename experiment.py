@@ -8,13 +8,13 @@ from numpy.polynomial.polynomial import Polynomial
 ds = xr.open_dataset("dataset/data_stream-mnth.nc")
 
 # Select June, July, August and compute mean over the specified region
-ds_summer = ds.sel(time=ds.time.dt.month.isin([6, 7, 8]))
+ds_summer = ds.sel(valid_time=ds.valid_time.dt.month.isin([6, 7, 8]))
 global_mean = ds_summer['t2m'].mean(dim=['latitude', 'longitude'])
 
 # Extract time (years) and temperature, clean NaNs
-time = global_mean['time'].dt.year.values
+time = global_mean['valid_time'].dt.year.values
 temp = global_mean.values
-temp_clean = temp[~np.isnan(temp)]
+temp_clean = temp[~np.isnan(temp)] - 273.15
 time_clean = time[~np.isnan(temp)]
 
 # Select uniform interval points
@@ -146,10 +146,10 @@ def local_poly_regression(x, x_vals, y_vals, degree=4, num_neighbors=8):
 years_pred = np.arange(1950, 2021)
 
 # Local interpolations
-local_forward_pred = [local_newton_forward(x, uniform_years, uniform_temps) for x in years_pred]
-local_backward_pred = [local_newton_backward(x, uniform_years, uniform_temps) for x in years_pred]
-local_lagrange_pred = [local_lagrange_interp(x, uniform_years, uniform_temps) for x in years_pred]
-local_reg_pred = [local_poly_regression(x, uniform_years, uniform_temps) for x in years_pred]
+local_forward_pred = [min(100, max(-20, local_newton_forward(x, uniform_years, uniform_temps))) for x in years_pred]
+local_backward_pred = [min(100, max(-20, local_newton_backward(x, uniform_years, uniform_temps))) for x in years_pred]
+local_lagrange_pred = [min(100, max(-20, local_lagrange_interp(x, uniform_years, uniform_temps))) for x in years_pred]
+local_reg_pred = [min(100, max(-20, local_poly_regression(x, uniform_years, uniform_temps))) for x in years_pred]
 
 # Actual values
 actual = np.interp(years_pred, time_clean, temp_clean)

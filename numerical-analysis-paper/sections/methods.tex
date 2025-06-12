@@ -2,9 +2,9 @@
 
 \subsection{Dataset Description and Preprocessing}
 
-We use the GISS Surface Temperature Analysis (GISTEMP v4) dataset provided by NASA Goddard Institute for Space Studies \cite{gistemp}. This dataset contains monthly global mean temperature anomalies from 1880 to the present, calculated relative to a 1951--1980 baseline. For this study, we extract annual global mean temperature anomalies for the period 1950--2020.
+We use the ERA5-Land reanalysis dataset \cite{ERA5} that provides hourly 2-meter air temperature data over Iran. For this study, we extract the temperature values at 10 AM local time for the summer months (June, July, August) for each year in the period 1950--2020. The data is spatially gridded, covering the region of Iran with a regular latitude-longitude grid.
 
-Prior to analysis, we perform data cleaning by removing any missing values (NaNs) from the temperature and time arrays. The global mean is computed by averaging over all spatial grid points. To facilitate fair comparison between interpolation methods, we generate uniformly spaced sample points using linear interpolation, ensuring that all methods operate on the same input data.
+Prior to analysis, we perform data cleaning by removing any missing values (NaNs) from the temperature arrays. For each grid point, we compute the mean summer temperature at 10 AM for each year. This results in a time series of summer daytime temperatures for each location. To facilitate fair comparison between interpolation methods, we generate uniformly spaced sample points using linear interpolation, ensuring that all methods operate on the same input data.
 
 \subsection{Choice of Training Intervals}
 
@@ -12,7 +12,7 @@ To evaluate the robustness and generalization of each interpolation method, we c
 
 \subsection{Local, Pointwise Interpolation Strategy}
 
-For each target year, interpolation is performed using a local window of the 8 nearest neighbors. This local approach offers several advantages:
+For each target year and location, interpolation is performed using a local window of the 8 nearest neighbors in time. This local approach offers several advantages:
 \begin{itemize}
     \item \textbf{Increased accuracy:} By focusing on nearby data, the interpolant better captures local trends and reduces the influence of distant, potentially irrelevant points.
     \item \textbf{Reduced oscillations:} Local polynomials are less prone to Runge's phenomenon and numerical instability than high-degree global polynomials.
@@ -24,14 +24,16 @@ For each method, if insufficient neighbors are available, the window size or pol
 
 We implement and compare the following interpolation methods:
 \begin{itemize}
-    \item \textbf{Local Newton Forward Interpolation:} Constructs an interpolating polynomial using forward differences, suitable for points near the start of the interval \cite{atkinson1989introduction, burden2011numerical}.
-    \item \textbf{Local Newton Backward Interpolation:} Uses backward differences, providing better accuracy near the end of the interval.
-    \item \textbf{Local Lagrange Interpolation:} Builds a polynomial passing through the local window, offering flexibility and high local accuracy \cite{atkinson1989introduction}.
-    \item \textbf{Local Polynomial Regression:} Fits a polynomial of specified degree to the local window using least squares, with normalization for numerical stability \cite{brown2021polynomial}.
+    \item \textbf{Local Newton Forward Interpolation:} Constructs an interpolating polynomial using forward differences, suitable for points near the start of the interval \cite{atkinson1989introduction, burden2011numerical, garcia2022newton}.
+    \item \textbf{Local Newton Backward Interpolation:} Uses backward differences, providing better accuracy near the end of the interval \cite{garcia2022newton}.
+    \item \textbf{Local Lagrange Interpolation:} Builds a polynomial passing through the local window, offering flexibility and high local accuracy \cite{atkinson1989introduction, smith2020numerical, lee2019comparison}.
+    \item \textbf{Local Polynomial Regression:} Fits a polynomial of specified degree to the local window using least squares, with normalization for numerical stability \cite{brown2021polynomial, press2007numerical}.
 \end{itemize}
 
 All methods are implemented in Python using \texttt{numpy}, \texttt{scipy}, and \texttt{matplotlib}. If polynomial fitting fails, the code falls back to linear interpolation to ensure robustness.
 
 \subsection{Evaluation and Output}
 
-For each method and interval, we predict temperature anomalies for each year in the evaluation range and compare them to the actual observed values. Results are visualized as plots and saved as CSV files for further analysis. Performance is quantified using root mean square error (RMSE).
+For each method and interval, we predict summer 10 AM temperatures for each year in the evaluation range and compare them to the actual observed values. Results are visualized as plots and saved as CSV files for further analysis. Performance is quantified using root mean square error (RMSE).
+
+To further reduce the impact of outliers and unrealistic values, all final temperature estimates were limited to the range $[-20, 100]$ degrees Celsius.
